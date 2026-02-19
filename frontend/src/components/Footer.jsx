@@ -138,7 +138,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright Notice */}
+        {/* Copyright */}
         <div className="mt-12 pt-8 border-t border-gray-800">
           <p className="text-center text-sm">
             © {currentYear} Visit Sri Lanka. All rights reserved.

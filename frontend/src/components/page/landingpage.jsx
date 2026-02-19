@@ -117,13 +117,6 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-black text-white text-center py-8 mt-10">
-        <p className="text-sm">
-          © {new Date().getFullYear()} Visit Sri Lanka. All rights reserved.
-        </p>
-      </footer>
     </div>
   );
 }
