@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const destinations = ["Colombo", "Kandy", "Sigiriya", "Ella", "Galle"];
 const navItems = ["Home", "Hotels", "Tour Packages", "About", "Contact"];
@@ -6,6 +7,7 @@ const navItems = ["Home", "Hotels", "Tour Packages", "About", "Contact"];
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDestinationsOpen, setIsDestinationsOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
@@ -69,7 +71,12 @@ export default function Navbar() {
 
           {/* Right Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <button className="text-teal-700 font-medium hover:underline">Login</button>
+            <button 
+              onClick={() => navigate('/signin')}
+              className="text-teal-700 font-medium hover:underline"
+            >
+              Login
+            </button>
             <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-full shadow transition">
               Register
             </button>
@@ -122,10 +129,13 @@ export default function Navbar() {
             </div>
 
             <div className="flex gap-3 pt-3 border-t">
-              <button className="flex-1 border border-teal-600 text-teal-600 py-2 rounded-lg">
+              <button 
+                onClick={() => navigate('/signin')}
+                className="flex-1 border border-teal-600 text-teal-600 py-2 rounded-lg"
+              >
                 Login
               </button>
-              <button className="flex-1 bg-teal-600 text-white py-2 rounded-lg">
+             <button className="flex-1 bg-teal-600 text-white py-2 rounded-lg">
                 Register
               </button>
             </div>
