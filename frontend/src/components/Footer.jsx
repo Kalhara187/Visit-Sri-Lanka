@@ -6,7 +6,7 @@ export default function Footer() {
     { name: 'Destinations', href: '#' },
     { name: 'Hotels', href: '#' },
     { name: 'Tour Packages', href: '#' },
-    { name: 'About', href: '#' },
+    { name: 'About', href: '/about' },
     { name: 'Contact', href: '#' },
   ];
 
@@ -68,8 +68,8 @@ export default function Footer() {
               <span className="text-xl font-bold text-white">Visit Sri Lanka</span>
             </div>
             <p className="text-sm leading-relaxed">
-              Your ultimate guide to exploring the beautiful island of Sri Lanka. 
-              Find the best hotels, discover amazing destinations, and plan your 
+              Your ultimate guide to exploring the beautiful island of Sri Lanka.
+              Find the best hotels, discover amazing destinations, and plan your
               perfect trip with our comprehensive travel resources.
             </p>
           </div>

@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const destinations = ["Colombo", "Kandy", "Sigiriya", "Ella", "Galle"];
-const navItems = ["Home", "Hotels", "Tour Packages", "About", "Contact"];
+const navItems = [
+  { name: "Home", path: "/" },
+  { name: "Hotels", path: "#" },
+  { name: "Tour Packages", path: "#" },
+  { name: "About", path: "/about" },
+  { name: "Contact", path: "#" },
+];
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,11 +31,17 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <a
-                key={item}
-                href="#"
+                key={item.name}
+                href={item.path}
+                onClick={(e) => {
+                  if (item.path !== "#") {
+                    e.preventDefault();
+                    navigate(item.path);
+                  }
+                }}
                 className="relative font-medium text-gray-700 hover:text-teal-600 transition"
               >
-                {item}
+                {item.name}
                 <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-teal-600 transition-all group-hover:w-full"></span>
               </a>
             ))}
@@ -42,9 +54,8 @@ export default function Navbar() {
               >
                 Destinations
                 <svg
-                  className={`ml-1 h-4 w-4 transition-transform ${
-                    isDestinationsOpen ? "rotate-180" : ""
-                  }`}
+                  className={`ml-1 h-4 w-4 transition-transform ${isDestinationsOpen ? "rotate-180" : ""
+                    }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -71,7 +82,7 @@ export default function Navbar() {
 
           {/* Right Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <button 
+            <button
               onClick={() => navigate('/signin')}
               className="text-teal-700 font-medium hover:underline"
             >
@@ -103,8 +114,19 @@ export default function Navbar() {
         <div className="md:hidden bg-white border-t border-gray-100 shadow-sm">
           <div className="px-4 py-4 space-y-3">
             {navItems.map((item) => (
-              <a key={item} href="#" className="block font-medium text-gray-700 hover:text-teal-600">
-                {item}
+              <a
+                key={item.name}
+                href={item.path}
+                onClick={(e) => {
+                  if (item.path !== "#") {
+                    e.preventDefault();
+                    navigate(item.path);
+                    setIsMenuOpen(false);
+                  }
+                }}
+                className="block font-medium text-gray-700 hover:text-teal-600"
+              >
+                {item.name}
               </a>
             ))}
 
@@ -129,13 +151,13 @@ export default function Navbar() {
             </div>
 
             <div className="flex gap-3 pt-3 border-t">
-              <button 
+              <button
                 onClick={() => navigate('/signin')}
                 className="flex-1 border border-teal-600 text-teal-600 py-2 rounded-lg"
               >
                 Login
               </button>
-             <button className="flex-1 bg-teal-600 text-white py-2 rounded-lg">
+              <button className="flex-1 bg-teal-600 text-white py-2 rounded-lg">
                 Register
               </button>
             </div>
