@@ -88,7 +88,10 @@ export default function Navbar() {
             >
               Login
             </button>
-            <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-full shadow transition">
+            <button
+              onClick={() => navigate('/register')}
+              className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-full shadow transition"
+            >
               Register
             </button>
           </div>
@@ -157,7 +160,10 @@ export default function Navbar() {
               >
                 Login
               </button>
-              <button className="flex-1 bg-teal-600 text-white py-2 rounded-lg">
+              <button
+                onClick={() => { navigate('/register'); setIsMenuOpen(false); }}
+                className="flex-1 bg-teal-600 text-white py-2 rounded-lg"
+              >
                 Register
               </button>
             </div>

@@ -17,7 +17,7 @@ export default function SignIn() {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -25,7 +25,7 @@ export default function SignIn() {
         [name]: ''
       }));
     }
-    
+
     // Clear general error message
     if (errors.general) {
       setErrors(prev => ({
@@ -44,7 +44,7 @@ export default function SignIn() {
   // Validate form data before submission
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!validateEmail(formData.email)) {
@@ -61,21 +61,21 @@ export default function SignIn() {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Validate form
     const validationErrors = validateForm();
-    
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     // Simulate login API call
     setTimeout(() => {
       console.log('Login attempt:', formData);
-      
+
       // Demo credentials - in production this would be an API call
       if (formData.email === 'test@example.com' && formData.password === 'password123') {
         alert('Login successful! Welcome back to Visit Sri Lanka!');
@@ -92,7 +92,7 @@ export default function SignIn() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-sri-lanka-sand/30 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
-        
+
         {/* Logo Section */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
@@ -104,7 +104,7 @@ export default function SignIn() {
 
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-          
+
           {/* Header */}
           <div className="bg-gradient-to-r from-teal-600 to-teal-700 px-8 py-8">
             <h2 className="text-white text-center text-3xl font-bold mb-2">Sign In</h2>
@@ -113,7 +113,7 @@ export default function SignIn() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="px-8 py-8">
-            
+
             {/* Error Message Display */}
             {errors.general && (
               <div className="mb-6">
@@ -126,11 +126,11 @@ export default function SignIn() {
             {/* Email Field */}
             <div className="mb-5">
               <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Email Address</label>
-              <input 
-                type="email" 
-                id="email" 
-                name="email" 
-                value={formData.email} 
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 className={`w-full px-4 py-3 rounded-lg border ${errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200'} outline-none transition`}
                 placeholder="you@example.com"
@@ -144,11 +144,11 @@ export default function SignIn() {
             <div className="mb-6">
               <label htmlFor="password" className="block text-gray-700 font-medium mb-2">Password</label>
               <div className="relative">
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  id="password" 
-                  name="password" 
-                  value={formData.password} 
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
                   onChange={handleChange}
                   className={`w-full px-4 py-3 pr-12 rounded-lg border ${errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200'} outline-none transition`}
                   placeholder="Enter your password"
@@ -215,12 +215,12 @@ export default function SignIn() {
             <div className="text-center">
               <p className="text-gray-600">
                 Don't have an account?{' '}
-                <a href="#" className="text-teal-600 hover:text-teal-700 font-semibold transition">
+                <a href="/register" className="text-teal-600 hover:text-teal-700 font-semibold transition">
                   Create Account
                 </a>
               </p>
             </div>
-            
+
           </form>
         </div>
 

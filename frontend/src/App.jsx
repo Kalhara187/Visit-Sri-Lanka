@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import LandingPage from "./components/page/landingpage";
 import SignIn from "./components/page/SignIn";
+import Register from "./components/page/Register";
 import AboutPage from "./components/page/AboutPage";
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/about" element={<AboutPage />} />
           </Routes>
         </main>
@@ -22,3 +24,4 @@ export default function App() {
     </Router>
   );
 }
+
