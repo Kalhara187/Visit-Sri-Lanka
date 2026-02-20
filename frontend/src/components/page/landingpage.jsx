@@ -117,6 +117,30 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
+      {/* Map Section */}
+      <section className="py-20 px-6">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Explore Sri Lanka
+        </h2>
+        <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          Discover the beautiful locations across the island. Click on the map to
+          explore tourist destinations, hotels, and attractions.
+        </p>
+
+        <div className="max-w-6xl mx-auto rounded-2xl overflow-hidden shadow-2xl">
+          <iframe
+            src="https://www.google.com/maps?q=Sri%20Lanka&output=embed"
+            width="100%"
+            height="450"
+            style={{ border: 0 }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Sri Lanka Map"
+          ></iframe>
+        </div>
+      </section>
     </div>
   );
 }
