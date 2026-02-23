@@ -10,6 +10,7 @@ export default function Register() {
         password: "",
         confirmPassword: "",
         phone: "",
+        userType: "",
         acceptTerms: false,
     });
 
@@ -59,6 +60,7 @@ export default function Register() {
         if (!formData.confirmPassword) e.confirmPassword = "Please confirm your password";
         else if (formData.password !== formData.confirmPassword)
             e.confirmPassword = "Passwords do not match";
+        if (!formData.userType) e.userType = "Please select an account type";
         if (!formData.acceptTerms) e.acceptTerms = "You must accept the Terms & Conditions";
         return e;
     };
@@ -83,6 +85,7 @@ export default function Register() {
         formData.email &&
         formData.password &&
         formData.confirmPassword &&
+        formData.userType &&
         formData.acceptTerms;
 
     /* ═══════════════════════ JSX ═══════════════════════ */
@@ -348,6 +351,65 @@ export default function Register() {
                                         placeholder="+94 77 123 4567"
                                     />
                                 </div>
+                            </div>
+
+                            {/* ── User Type Selection ── */}
+                            <div className="anim-fade-up anim-d3">
+                                <label className="block text-gray-700 font-medium mb-3 text-sm">
+                                    Select Account Type <span className="text-red-400">*</span>
+                                </label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {/* Traveler Option */}
+                                    <label
+                                        className={`relative cursor-pointer group ${formData.userType === "traveler" ? "ring-2 ring-teal-500 ring-offset-2 rounded-xl" : ""}`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="userType"
+                                            value="traveler"
+                                            checked={formData.userType === "traveler"}
+                                            onChange={handleChange}
+                                            className="peer sr-only"
+                                        />
+                                        <div className={`p-4 rounded-xl border-2 transition-all duration-200 ${formData.userType === "traveler" ? "border-teal-500 bg-teal-50" : "border-gray-200 hover:border-teal-300 hover:bg-gray-50"}`}>
+                                            <div className="flex flex-col items-center text-center">
+                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${formData.userType === "traveler" ? "bg-teal-500 text-white" : "bg-gray-100 text-gray-600"}`}>
+                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                    </svg>
+                                                </div>
+                                                <span className={`font-semibold text-sm ${formData.userType === "traveler" ? "text-teal-700" : "text-gray-700"}`}>Traveler</span>
+                                                <span className="text-xs text-gray-500 mt-1">Book hotels & tours</span>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    {/* Hotel Owner Option */}
+                                    <label
+                                        className={`relative cursor-pointer group ${formData.userType === "hotelOwner" ? "ring-2 ring-teal-500 ring-offset-2 rounded-xl" : ""}`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="userType"
+                                            value="hotelOwner"
+                                            checked={formData.userType === "hotelOwner"}
+                                            onChange={handleChange}
+                                            className="peer sr-only"
+                                        />
+                                        <div className={`p-4 rounded-xl border-2 transition-all duration-200 ${formData.userType === "hotelOwner" ? "border-teal-500 bg-teal-50" : "border-gray-200 hover:border-teal-300 hover:bg-gray-50"}`}>
+                                            <div className="flex flex-col items-center text-center">
+                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${formData.userType === "hotelOwner" ? "bg-teal-500 text-white" : "bg-gray-100 text-gray-600"}`}>
+                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125-1.125 1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                                                    </svg>
+                                                </div>
+                                                <span className={`font-semibold text-sm ${formData.userType === "hotelOwner" ? "text-teal-700" : "text-gray-700"}`}>Hotel Owner</span>
+                                                <span className="text-xs text-gray-500 mt-1">Manage hotels & rooms</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                {errors.userType && <p className="text-red-500 text-xs mt-2">{errors.userType}</p>}
                             </div>
 
                             {/* ── Terms checkbox ── */}
