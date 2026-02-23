@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const destinations = ["Colombo", "Kandy", "Sigiriya", "Ella", "Galle"];
 const navItems = [
   { name: "Home", path: "/" },
-  { name: "Hotels", path: "#" },
+  { name: "Hotels", path: "/hotels" },
   { name: "Tour Packages", path: "/packages" },
   { name: "About", path: "/about" },
   { name: "Contact", path: "/contact" },

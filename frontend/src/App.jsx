@@ -7,6 +7,7 @@ import Register from "./components/page/Register";
 import AboutPage from "./components/page/AboutPage";
 import ContactPage from "./components/page/ContactPage";
 import TourPackagesPage from "./components/page/TourPackagesPage";
+import HotelsPage from "./components/page/HotelsPage";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/packages" element={<TourPackagesPage />} />
+            <Route path="/hotels" element={<HotelsPage />} />
           </Routes>
         </main>
         <Footer />
