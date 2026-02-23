@@ -5,9 +5,9 @@ const destinations = ["Colombo", "Kandy", "Sigiriya", "Ella", "Galle"];
 const navItems = [
   { name: "Home", path: "/" },
   { name: "Hotels", path: "#" },
-  { name: "Tour Packages", path: "#" },
+  { name: "Tour Packages", path: "/packages" },
   { name: "About", path: "/about" },
-  { name: "Contact", path: "#" },
+  { name: "Contact", path: "/contact" },
 ];
 
 export default function Navbar() {
