@@ -422,11 +422,11 @@ export default function Register() {
                                     />
                                     <span className="text-sm text-gray-600 leading-snug group-hover:text-gray-800 transition">
                                         I agree to the{" "}
-                                        <a href="#" className="text-teal-600 hover:text-teal-700 font-medium underline underline-offset-2">
+                                        <a href="/terms" className="text-teal-600 hover:text-teal-700 font-medium underline underline-offset-2">
                                             Terms & Conditions
                                         </a>{" "}
                                         and{" "}
-                                        <a href="#" className="text-teal-600 hover:text-teal-700 font-medium underline underline-offset-2">
+                                        <a href="/terms" className="text-teal-600 hover:text-teal-700 font-medium underline underline-offset-2">
                                             Privacy Policy
                                         </a>
                                     </span>

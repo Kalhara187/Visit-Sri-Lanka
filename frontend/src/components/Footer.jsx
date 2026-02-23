@@ -2,12 +2,13 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const quickLinks = [
-    { name: 'Home', href: '#' },
-    { name: 'Destinations', href: '#' },
-    { name: 'Hotels', href: '#' },
-    { name: 'Tour Packages', href: '#' },
+    { name: 'Home', href: '/' },
+    { name: 'Destinations', href: '/destinations' },
+    { name: 'Hotels', href: '/hotels' },
+    { name: 'Tour Packages', href: '/packages' },
     { name: 'About', href: '/about' },
-    { name: 'Contact', href: '#' },
+    { name: 'Contact', href: '/contact' },
+    { name: 'Terms & Conditions', href: '/terms' },
   ];
 
   const contactInfo = {

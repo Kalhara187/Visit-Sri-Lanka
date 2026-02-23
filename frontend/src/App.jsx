@@ -9,6 +9,7 @@ import ContactPage from "./components/page/ContactPage";
 import TourPackagesPage from "./components/page/TourPackagesPage";
 import HotelsPage from "./components/page/HotelsPage";
 import DestinationsPage from "./components/page/DestinationsPage";
+import TermsAndConditionsPage from "./components/page/TermsAndConditionsPage";
 
 export default function App() {
   return (
@@ -24,7 +25,8 @@ export default function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/packages" element={<TourPackagesPage />} />
             <Route path="/hotels" element={<HotelsPage />} />
-            <Route path="/destinations" element={<DestinationsPage />} />
+<Route path="/destinations" element={<DestinationsPage />} />
+            <Route path="/terms" element={<TermsAndConditionsPage />} />
           </Routes>
         </main>
         <Footer />
