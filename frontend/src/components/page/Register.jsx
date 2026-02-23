@@ -65,19 +65,49 @@ export default function Register() {
         return e;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const v = validateForm();
         if (Object.keys(v).length > 0) { setErrors(v); return; }
 
         setIsLoading(true);
-        // simulate API
-        setTimeout(() => {
-            console.log("Register:", formData);
-            alert("Account created successfully! Welcome to Visit Sri Lanka 🎉");
+        
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: formData.fullName,
+                    email: formData.email,
+                    password: formData.password,
+                    confirmPassword: formData.confirmPassword,
+                    phone: formData.phone,
+                    userType: formData.userType,
+                    acceptTerms: formData.acceptTerms
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert("Account created successfully! Welcome to Visit Sri Lanka 🎉");
+                navigate("/signin");
+            } else {
+                // Handle validation errors from backend
+                if (data.errors) {
+                    setErrors(data.errors);
+                } else {
+                    setErrors({ general: data.message || 'Registration failed' });
+                }
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            setErrors({ general: 'Unable to connect to server. Please try again.' });
+        } finally {
             setIsLoading(false);
-            navigate("/signin");
-        }, 1500);
+        }
     };
 
     const isFormValid =
