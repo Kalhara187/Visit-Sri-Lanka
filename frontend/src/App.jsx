@@ -8,6 +8,7 @@ import AboutPage from "./components/page/AboutPage";
 import ContactPage from "./components/page/ContactPage";
 import TourPackagesPage from "./components/page/TourPackagesPage";
 import HotelsPage from "./components/page/HotelsPage";
+import DestinationsPage from "./components/page/DestinationsPage";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/packages" element={<TourPackagesPage />} />
             <Route path="/hotels" element={<HotelsPage />} />
+            <Route path="/destinations" element={<DestinationsPage />} />
           </Routes>
         </main>
         <Footer />

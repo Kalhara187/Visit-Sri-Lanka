@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const destinations = ["Colombo", "Kandy", "Sigiriya", "Ella", "Galle"];
 const navItems = [
   { name: "Home", path: "/" },
+  { name: "Destinations", path: "/destinations" },
   { name: "Hotels", path: "/hotels" },
   { name: "Tour Packages", path: "/packages" },
   { name: "About", path: "/about" },
@@ -12,7 +12,6 @@ const navItems = [
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDestinationsOpen, setIsDestinationsOpen] = useState(false);
   const navigate = useNavigate();
 
   return (
@@ -34,50 +33,14 @@ export default function Navbar() {
                 key={item.name}
                 href={item.path}
                 onClick={(e) => {
-                  if (item.path !== "#") {
-                    e.preventDefault();
-                    navigate(item.path);
-                  }
+                  e.preventDefault();
+                  navigate(item.path);
                 }}
                 className="relative font-medium text-gray-700 hover:text-teal-600 transition"
               >
                 {item.name}
-                <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-teal-600 transition-all group-hover:w-full"></span>
               </a>
             ))}
-
-            {/* Destinations Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsDestinationsOpen(!isDestinationsOpen)}
-                className="flex items-center font-medium text-gray-700 hover:text-teal-600 transition"
-              >
-                Destinations
-                <svg
-                  className={`ml-1 h-4 w-4 transition-transform ${isDestinationsOpen ? "rotate-180" : ""
-                    }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {isDestinationsOpen && (
-                <div className="absolute left-0 mt-3 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-2">
-                  {destinations.map((place) => (
-                    <a
-                      key={place}
-                      href="#"
-                      className="block px-4 py-2 text-gray-700 hover:bg-teal-50 hover:text-teal-600 transition"
-                    >
-                      {place}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Right Buttons */}
@@ -121,37 +84,15 @@ export default function Navbar() {
                 key={item.name}
                 href={item.path}
                 onClick={(e) => {
-                  if (item.path !== "#") {
-                    e.preventDefault();
-                    navigate(item.path);
-                    setIsMenuOpen(false);
-                  }
+                  e.preventDefault();
+                  navigate(item.path);
+                  setIsMenuOpen(false);
                 }}
                 className="block font-medium text-gray-700 hover:text-teal-600"
               >
                 {item.name}
               </a>
             ))}
-
-            <div className="border-t pt-3">
-              <button
-                onClick={() => setIsDestinationsOpen(!isDestinationsOpen)}
-                className="flex justify-between w-full font-medium text-gray-700"
-              >
-                Destinations
-                <span>{isDestinationsOpen ? "−" : "+"}</span>
-              </button>
-
-              {isDestinationsOpen && (
-                <div className="mt-2 pl-3 space-y-1">
-                  {destinations.map((place) => (
-                    <a key={place} href="#" className="block text-gray-600 hover:text-teal-600">
-                      {place}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
 
             <div className="flex gap-3 pt-3 border-t">
               <button
