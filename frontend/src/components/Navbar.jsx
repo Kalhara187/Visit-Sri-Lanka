@@ -47,12 +47,78 @@ export default function Navbar() {
             className="flex items-center space-x-3 cursor-pointer group"
             onClick={() => navigate('/')}
           >
+            {/* Tropical Travel Logo - Palm Tree + Sun + Wave */}
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300 ${
               scrolled 
-                ? "bg-gradient-to-br from-ocean-500 via-teal-500 to-saffron-500" 
+                ? "bg-gradient-to-br from-ocean-500 via-teal-500 to-green-500" 
                 : "bg-white/20 backdrop-blur-sm border border-white/30"
             }`}>
-              <span className={`text-xl font-bold ${scrolled ? "text-white" : "text-white"}`}>SL</span>
+              <svg 
+                viewBox="0 0 48 48" 
+                className="w-8 h-8"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Sun */}
+                <circle cx="36" cy="12" r="8" fill="#FFD700" />
+                <circle cx="36" cy="12" r="5" fill="#FFA500" />
+                
+                {/* Palm Tree Trunk */}
+                <path 
+                  d="M18 44 L18 24 Q18 20 20 18 L20 44" 
+                  fill="#8B4513"
+                />
+                <path 
+                  d="M18 24 Q22 20 24 24 Q22 28 18 24" 
+                  fill="#8B4513"
+                />
+                
+                {/* Palm Fronds */}
+                <path 
+                  d="M18 20 Q10 12 6 18 Q12 14 18 20" 
+                  fill="#16a34a"
+                  stroke="#15803d"
+                  strokeWidth="0.5"
+                />
+                <path 
+                  d="M18 20 Q12 10 8 12 Q14 10 18 18" 
+                  fill="#22c55e"
+                  stroke="#16a34a"
+                  strokeWidth="0.5"
+                />
+                <path 
+                  d="M18 20 Q24 8 28 10 Q26 14 20 18" 
+                  fill="#22c55e"
+                  stroke="#16a34a"
+                  strokeWidth="0.5"
+                />
+                <path 
+                  d="M18 20 Q30 14 34 18 Q30 20 22 20" 
+                  fill="#16a34a"
+                  stroke="#15803d"
+                  strokeWidth="0.5"
+                />
+                <path 
+                  d="M18 20 Q28 22 32 28 Q26 26 20 22" 
+                  fill="#22c55e"
+                  stroke="#16a34a"
+                  strokeWidth="0.5"
+                />
+                
+                {/* Wave at bottom */}
+                <path 
+                  d="M4 40 Q12 36 16 40 Q24 44 28 40 Q36 36 44 40 L44 48 L4 48 Z" 
+                  fill="#0ea5e9"
+                  opacity="0.8"
+                />
+                <path 
+                  d="M8 44 Q16 40 20 44 Q28 48 32 44" 
+                  fill="none"
+                  stroke="#38bdf8"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
             </div>
             <div className="flex flex-col">
               <span className={`text-xl font-bold bg-clip-text text-transparent transition-all duration-300 ${
@@ -63,9 +129,9 @@ export default function Navbar() {
                 Visit Sri Lanka
               </span>
               <span className={`text-xs font-medium -mt-1 hidden sm:block transition-colors duration-300 ${
-                scrolled ? "text-saffron" : "text-saffron-light"
+                scrolled ? "text-saffron" : "text-white/80"
               }`}>
-                Paradise Island
+                Tropical Paradise
               </span>
             </div>
           </div>
@@ -82,8 +148,8 @@ export default function Navbar() {
                 }}
                 className={`relative px-4 py-2 font-semibold text-sm tracking-wide transition-all duration-300 group ${
                   isActive(item.path) 
-                    ? scrolled ? "text-ocean-600" : "text-white"
-                    : scrolled ? "text-gray-600 hover:text-ocean-600" : "text-white/80 hover:text-white"
+                    ? scrolled ? "text-black" : "text-white"
+                    : scrolled ? "text-gray-800 hover:text-black" : "text-white/80 hover:text-white"
                 }`}
               >
                 {item.name}
