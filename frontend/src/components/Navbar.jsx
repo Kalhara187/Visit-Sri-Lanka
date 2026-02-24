@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -13,21 +13,38 @@ const navItems = [
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if a nav item is active
+  const isActive = (path) => {
+    if (path === "/") return location.pathname === "/";
+    return location.pathname.startsWith(path);
+  };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg shadow-md border-b border-teal-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
-              <span className="text-white font-bold">SL</span>
+          <div 
+            className="flex items-center space-x-3 cursor-pointer group"
+            onClick={() => navigate('/')}
+          >
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 via-teal-600 to-ocean-600 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
+              <span className="text-white font-bold text-lg">SL</span>
             </div>
-            <span className="text-xl font-bold text-teal-700">Visit Sri Lanka</span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold bg-gradient-to-r from-teal-700 to-ocean-600 bg-clip-text text-transparent">
+                Visit Sri Lanka
+              </span>
+              <span className="text-xs text-saffron font-medium -mt-1 hidden sm:block">
+                Paradise Island
+              </span>
+            </div>
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
               <a
                 key={item.name}
@@ -36,24 +53,37 @@ export default function Navbar() {
                   e.preventDefault();
                   navigate(item.path);
                 }}
-                className="relative font-medium text-gray-700 hover:text-teal-600 transition"
+                className={`relative px-4 py-2 font-medium transition-all duration-300 group ${
+                  isActive(item.path) 
+                    ? "text-teal-700" 
+                    : "text-gray-700 hover:text-teal-600"
+                }`}
               >
                 {item.name}
+                {/* Active indicator */}
+                <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-gradient-to-r from-teal-500 to-ocean-500 transition-all duration-300 ${
+                  isActive(item.path) ? "w-full" : "w-0 group-hover:w-full"
+                }`} />
+                {/* Hover underline animation */}
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-saffron w-0 group-hover:w-full transition-all duration-300" />
               </a>
             ))}
           </div>
 
-          {/* Right Buttons */}
-          <div className="hidden md:flex items-center space-x-3">
+          {/* Right Buttons - CTA */}
+          <div className="hidden md:flex items-center space-x-4">
             <button
               onClick={() => navigate('/signin')}
-              className="text-teal-700 font-medium hover:underline"
+              className="relative px-6 py-2.5 font-semibold text-teal-700 border-2 border-teal-600 rounded-full overflow-hidden group"
             >
-              Login
+              <span className="relative z-10 transition-colors duration-300 group-hover:text-white">
+                Sign In
+              </span>
+              <div className="absolute inset-0 bg-teal-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </button>
             <button
               onClick={() => navigate('/register')}
-              className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-full shadow transition"
+              className="relative px-6 py-2.5 font-semibold text-white rounded-full bg-gradient-to-r from-teal-600 via-teal-700 to-ocean-600 shadow-lg shadow-teal-600/30 hover:shadow-xl hover:shadow-teal-600/40 hover:scale-105 transition-all duration-300"
             >
               Register
             </button>
@@ -62,7 +92,7 @@ export default function Navbar() {
           {/* Mobile Toggle */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-gray-700"
+            className="md:hidden p-2 text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors duration-200"
           >
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMenuOpen ? (
@@ -75,10 +105,14 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 shadow-sm">
-          <div className="px-4 py-4 space-y-3">
+      {/* Mobile Menu - Enhanced with animation */}
+      <div 
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="bg-white/98 backdrop-blur-lg border-t border-teal-100 shadow-lg">
+          <div className="px-4 py-6 space-y-4">
             {navItems.map((item) => (
               <a
                 key={item.name}
@@ -88,29 +122,39 @@ export default function Navbar() {
                   navigate(item.path);
                   setIsMenuOpen(false);
                 }}
-                className="block font-medium text-gray-700 hover:text-teal-600"
+                className={`block px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                  isActive(item.path)
+                    ? "text-teal-700 bg-teal-50 border-l-4 border-teal-600"
+                    : "text-gray-700 hover:text-teal-600 hover:bg-teal-50"
+                }`}
               >
                 {item.name}
               </a>
             ))}
 
-            <div className="flex gap-3 pt-3 border-t">
+            <div className="flex gap-3 pt-4 border-t border-gray-100">
               <button
-                onClick={() => navigate('/signin')}
-                className="flex-1 border border-teal-600 text-teal-600 py-2 rounded-lg"
+                onClick={() => {
+                  navigate('/signin');
+                  setIsMenuOpen(false);
+                }}
+                className="flex-1 border-2 border-teal-600 text-teal-700 font-semibold py-3 rounded-xl hover:bg-teal-50 transition-colors duration-200"
               >
-                Login
+                Sign In
               </button>
               <button
-                onClick={() => { navigate('/register'); setIsMenuOpen(false); }}
-                className="flex-1 bg-teal-600 text-white py-2 rounded-lg"
+                onClick={() => {
+                  navigate('/register');
+                  setIsMenuOpen(false);
+                }}
+                className="flex-1 bg-gradient-to-r from-teal-600 to-ocean-600 text-white font-semibold py-3 rounded-xl shadow-lg shadow-teal-600/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
               >
                 Register
               </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 }
