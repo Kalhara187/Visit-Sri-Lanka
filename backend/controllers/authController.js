@@ -1,9 +1,10 @@
+require('dotenv').config();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// JWT secret key - in production, use environment variable
+// JWT configuration from environment variables
 const JWT_SECRET = process.env.JWT_SECRET || 'visit-sri-lanka-secret-key-2024';
-const JWT_EXPIRES_IN = '24h';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 // Register a new user
 exports.register = async (req, res) => {

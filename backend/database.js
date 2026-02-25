@@ -1,39 +1,43 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+require('dotenv').config();
+const mysql = require('mysql2/promise');
 
-// Create database file path
-const dbPath = path.join(__dirname, 'visit-sri-lanka.db');
+// MySQL database configuration
+const dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'visit_user',
+    password: process.env.DB_PASSWORD || 'visit_password123',
+    database: process.env.DB_NAME || 'visit_sri_lanka',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+};
 
-// Initialize database
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('Error opening database:', err.message);
-    } else {
-        console.log('Connected to SQLite database');
+// Create pool connection
+const pool = mysql.createPool(dbConfig);
+
+// Test connection
+async function testConnection() {
+    try {
+        const connection = await pool.getConnection();
+        console.log('Connected to MySQL database');
+        connection.release();
+        return true;
+    } catch (err) {
+        console.error('Error connecting to MySQL database:', err.message);
+        return false;
+    }
+}
+
+// Initialize database (tables already created in MySQL)
+function initializeDatabase() {
+    console.log('Database tables verified');
+}
+
+// Test connection and initialize
+testConnection().then(success => {
+    if (success) {
         initializeDatabase();
     }
 });
 
-function initializeDatabase() {
-    // Create users table
-    db.run(`
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fullName TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            phone TEXT,
-            role TEXT NOT NULL DEFAULT 'traveler',
-            acceptTerms INTEGER NOT NULL DEFAULT 0,
-            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    `, (err) => {
-        if (err) {
-            console.error('Error creating users table:', err.message);
-        } else {
-            console.log('Users table created/verified');
-        }
-    });
-}
-
-module.exports = db;
+module.exports = pool;

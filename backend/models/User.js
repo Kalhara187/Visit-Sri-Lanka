@@ -51,14 +51,13 @@ class User {
 
     // Check if email already exists
     static checkEmailExists(email) {
-        return new Promise((resolve, reject) => {
-            db.get('SELECT id FROM users WHERE email = ?', [email.toLowerCase()], (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(!!row);
-                }
-            });
+        return new Promise(async (resolve, reject) => {
+            try {
+                const [rows] = await db.query('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
+                resolve(rows.length > 0);
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 
@@ -81,7 +80,7 @@ class User {
                     VALUES (?, ?, ?, ?, ?, ?)
                 `;
 
-                db.run(
+                const [result] = await db.query(
                     sql,
                     [
                         userData.fullName.trim(),
@@ -90,20 +89,15 @@ class User {
                         userData.phone || null,
                         role,
                         userData.acceptTerms ? 1 : 0
-                    ],
-                    function(err) {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve({
-                                id: this.lastID,
-                                fullName: userData.fullName.trim(),
-                                email: normalizedEmail,
-                                role: role
-                            });
-                        }
-                    }
+                    ]
                 );
+
+                resolve({
+                    id: result.insertId,
+                    fullName: userData.fullName.trim(),
+                    email: normalizedEmail,
+                    role: role
+                });
             } catch (error) {
                 reject(error);
             }
@@ -112,14 +106,13 @@ class User {
 
     // Find user by email
     static findByEmail(email) {
-        return new Promise((resolve, reject) => {
-            db.get('SELECT * FROM users WHERE email = ?', [email.toLowerCase()], (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+        return new Promise(async (resolve, reject) => {
+            try {
+                const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
+                resolve(rows[0] || null);
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 
