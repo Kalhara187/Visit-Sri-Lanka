@@ -59,7 +59,7 @@ export default function SignIn() {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate form
@@ -72,21 +72,47 @@ export default function SignIn() {
 
     setIsLoading(true);
 
-    // Simulate login API call
-    setTimeout(() => {
-      console.log('Login attempt:', formData);
+    try {
+      // Call the backend API
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+      });
 
-      // Demo credentials - in production this would be an API call
-      if (formData.email === 'test@example.com' && formData.password === 'password123') {
-        alert('Login successful! Welcome back to Visit Sri Lanka!');
-        setIsLoading(false);
+      const data = await response.json();
+
+      if (data.success) {
+        // Store JWT token in localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Role-based redirection
+        if (data.user.role === 'hotelOwner') {
+          // Redirect to Hotel Owner Dashboard
+          window.location.href = '/hotels';
+        } else {
+          // Redirect to User Dashboard (Traveler)
+          window.location.href = '/destinations';
+        }
       } else {
         setErrors({
-          general: 'Invalid email or password. Please try again.'
+          general: data.message || 'Invalid email or password. Please try again.'
         });
-        setIsLoading(false);
       }
-    }, 1000);
+    } catch (error) {
+      console.error('Login error:', error);
+      setErrors({
+        general: 'Unable to connect to the server. Please try again later.'
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

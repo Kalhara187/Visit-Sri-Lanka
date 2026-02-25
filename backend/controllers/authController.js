@@ -1,4 +1,9 @@
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+
+// JWT secret key - in production, use environment variable
+const JWT_SECRET = process.env.JWT_SECRET || 'visit-sri-lanka-secret-key-2024';
+const JWT_EXPIRES_IN = '24h';
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -104,10 +109,22 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Return success response
+        // Generate JWT token
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email,
+                role: user.role
+            },
+            JWT_SECRET,
+            { expiresIn: JWT_EXPIRES_IN }
+        );
+
+        // Return success response with token
         return res.status(200).json({
             success: true,
             message: 'Login successful',
+            token: token,
             user: {
                 id: user.id,
                 fullName: user.fullName,
