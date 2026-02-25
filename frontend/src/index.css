@@ -42,3 +42,48 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #006666;
 }
+
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #0d9488;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #14b8a6;
+}
+
+/* Theme Transition */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark mode body styles */
+body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+.dark body {
+  @apply bg-gray-900 text-gray-100;
+}
+
+/* Dark mode card styles */
+.dark .card {
+  @apply bg-gray-800 border-gray-700;
+}
+
+/* Dark mode input styles */
+.dark input,
+.dark textarea,
+.dark select {
+  @apply bg-gray-800 border-gray-700 text-gray-100;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  @apply text-gray-400;
+}

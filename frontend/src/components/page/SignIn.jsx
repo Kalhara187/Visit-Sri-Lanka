@@ -116,7 +116,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-sri-lanka-sand/30 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-sri-lanka-sand/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
 
         {/* Logo Section */}
@@ -124,12 +124,12 @@ export default function SignIn() {
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
             <span className="text-white font-bold text-xl">SL</span>
           </div>
-          <h1 className="text-sm font-semibold text-teal-600 tracking-wider uppercase mb-2">Visit Sri Lanka</h1>
-          <p className="text-gray-500">Your Gateway to Paradise</p>
+          <h1 className="text-sm font-semibold text-teal-600 dark:text-teal-400 tracking-wider uppercase mb-2">Visit Sri Lanka</h1>
+          <p className="text-gray-500 dark:text-gray-400">Your Gateway to Paradise</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
 
           {/* Header */}
           <div className="bg-gradient-to-r from-teal-600 to-teal-700 px-8 py-8">
@@ -143,22 +143,22 @@ export default function SignIn() {
             {/* Error Message Display */}
             {errors.general && (
               <div className="mb-6">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <p className="text-red-600 text-sm text-center">{errors.general}</p>
+                <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                  <p className="text-red-600 dark:text-red-400 text-sm text-center">{errors.general}</p>
                 </div>
               </div>
             )}
 
             {/* Email Field */}
             <div className="mb-5">
-              <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Email Address</label>
+              <label htmlFor="email" className="block text-gray-700 dark:text-gray-200 font-medium mb-2">Email Address</label>
               <input
                 type="email"
                 id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-lg border ${errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200'} outline-none transition`}
+                className={`w-full px-4 py-3 rounded-lg border ${errors.email ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200'} outline-none transition`}
                 placeholder="you@example.com"
               />
               {errors.email && (
@@ -168,7 +168,7 @@ export default function SignIn() {
 
             {/* Password Field */}
             <div className="mb-6">
-              <label htmlFor="password" className="block text-gray-700 font-medium mb-2">Password</label>
+              <label htmlFor="password" className="block text-gray-700 dark:text-gray-200 font-medium mb-2">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -176,7 +176,7 @@ export default function SignIn() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 pr-12 rounded-lg border ${errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200'} outline-none transition`}
+                  className={`w-full px-4 py-3 pr-12 rounded-lg border ${errors.password ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200'} outline-none transition`}
                   placeholder="Enter your password"
                 />
                 <button
