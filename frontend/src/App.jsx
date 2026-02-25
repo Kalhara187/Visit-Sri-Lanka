@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import LandingPage from "./components/page/landingpage";
@@ -14,26 +15,28 @@ import FeedbackPage from "./components/page/FeedbackPage";
 
 export default function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/packages" element={<TourPackagesPage />} />
-            <Route path="/hotels" element={<HotelsPage />} />
-            <Route path="/destinations" element={<DestinationsPage />} />
-            <Route path="/terms" element={<TermsAndConditionsPage />} />
-            <Route path="/feedback" element={<FeedbackPage />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-300">
+          <Navbar />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/packages" element={<TourPackagesPage />} />
+              <Route path="/hotels" element={<HotelsPage />} />
+              <Route path="/destinations" element={<DestinationsPage />} />
+              <Route path="/terms" element={<TermsAndConditionsPage />} />
+              <Route path="/feedback" element={<FeedbackPage />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

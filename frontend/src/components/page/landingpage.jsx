@@ -164,7 +164,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="font-sans text-gray-800">
+    <div className="font-sans text-gray-800 dark:text-gray-100">
       {/* Hero Section with Video Background */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Video Background */}
@@ -217,13 +217,13 @@ export default function LandingPage() {
       </section>
 
       {/* Featured Destinations Section */}
-      <section id="destinations" className="py-24 px-6 bg-gradient-to-b from-gray-50 to-white">
+      <section id="destinations" className="py-24 px-6 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800 dark:text-white">
               Featured Destinations
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Explore the most breathtaking locations across our beautiful island
             </p>
             <div className="w-24 h-1 bg-gradient-to-r from-sri-lanka-teal to-sri-lanka-ocean mx-auto mt-6 rounded-full"></div>
@@ -233,7 +233,7 @@ export default function LandingPage() {
             {destinations.map((place, index) => (
               <div
                 key={place.name}
-                className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="relative h-64 overflow-hidden">
@@ -248,10 +248,10 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-semibold mb-2 text-gray-800 group-hover:text-sri-lanka-teal transition-colors">
+                  <h3 className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white group-hover:text-sri-lanka-teal transition-colors">
                     {place.name}
                   </h3>
-                  <p className="text-gray-600">{place.description}</p>
+                  <p className="text-gray-600 dark:text-gray-300">{place.description}</p>
                   <button className="mt-4 text-sri-lanka-teal font-medium hover:underline flex items-center gap-1">
                     Learn More
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,13 +296,13 @@ export default function LandingPage() {
       </section>
 
       {/* Popular Tour Packages Section */}
-      <section className="py-24 px-6 bg-gray-50">
+      <section className="py-24 px-6 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800 dark:text-white">
               Popular Tour Packages
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Handcrafted itineraries for an unforgettable experience
             </p>
             <div className="w-24 h-1 bg-gradient-to-r from-sri-lanka-teal to-sri-lanka-ocean mx-auto mt-6 rounded-full"></div>
@@ -312,7 +312,7 @@ export default function LandingPage() {
             {tourPackages.map((tour, index) => (
               <div
                 key={tour.name}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
               >
                 <div className="relative h-48">
                   <img
@@ -325,10 +325,10 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-semibold mb-2 text-gray-800">{tour.name}</h3>
-                  <p className="text-gray-600 mb-4">{tour.description}</p>
+                  <h3 className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">{tour.name}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">{tour.description}</p>
                   <div className="mb-4">
-                    <p className="text-sm font-medium text-gray-500 mb-2">Highlights:</p>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Highlights:</p>
                     <div className="flex flex-wrap gap-2">
                       {tour.highlights.map((highlight) => (
                         <span
@@ -340,10 +340,10 @@ export default function LandingPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pt-4 border-t">
+                  <div className="flex items-center justify-between pt-4 border-t dark:border-gray-700">
                     <div>
                       <span className="text-3xl font-bold text-sri-lanka-teal">{tour.price}</span>
-                      <span className="text-gray-500 text-sm"> / person</span>
+                      <span className="text-gray-500 dark:text-gray-400 text-sm"> / person</span>
                     </div>
                     <button className="bg-sri-lanka-teal hover:bg-sri-lanka-teal-dark text-white px-6 py-2 rounded-lg transition-colors">
                       Book Now
@@ -357,13 +357,13 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-24 px-6 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800 dark:text-white">
               What Our Travelers Say
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Real experiences from our valued customers
             </p>
             <div className="w-24 h-1 bg-gradient-to-r from-sri-lanka-teal to-sri-lanka-ocean mx-auto mt-6 rounded-full"></div>
@@ -373,7 +373,7 @@ export default function LandingPage() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={testimonial.name}
-                className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-shadow"
+                className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-2xl p-8 shadow-md hover:shadow-xl transition-shadow"
               >
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -382,7 +382,7 @@ export default function LandingPage() {
                     </svg>
                   ))}
                 </div>
-                <p className="text-gray-600 mb-6 italic">"{testimonial.comment}"</p>
+                <p className="text-gray-600 dark:text-gray-300 mb-6 italic">"{testimonial.comment}"</p>
                 <div className="flex items-center">
                   <img
                     src={testimonial.image}
@@ -390,8 +390,8 @@ export default function LandingPage() {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div className="ml-4">
-                    <p className="font-semibold text-gray-800">{testimonial.name}</p>
-                    <p className="text-sm text-gray-500">{testimonial.location}</p>
+                    <p className="font-semibold text-gray-800 dark:text-white">{testimonial.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.location}</p>
                   </div>
                 </div>
               </div>
@@ -401,10 +401,10 @@ export default function LandingPage() {
       </section>
 
       {/* About Section */}
-      <section className="py-24 px-6 bg-gradient-to-r from-sri-lanka-sand to-white">
+      <section className="py-24 px-6 bg-gradient-to-r from-sri-lanka-sand to-white dark:from-gray-900 dark:to-gray-800">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800">About Sri Lanka</h2>
-          <p className="text-xl text-gray-600 leading-relaxed">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800 dark:text-white">About Sri Lanka</h2>
+          <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
             Sri Lanka is a tropical paradise famous for golden beaches, lush green
             mountains, wildlife safaris, and rich cultural heritage. Travelers
             from around the world visit this beautiful island to experience
@@ -423,13 +423,13 @@ export default function LandingPage() {
       </section>
 
       {/* Map Section */}
-      <section className="py-24 px-6 bg-gray-50">
+      <section className="py-24 px-6 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800 dark:text-white">
               Explore Sri Lanka
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Discover the beautiful locations across the island. Click on the map to
               explore tourist destinations, hotels, and attractions.
             </p>
