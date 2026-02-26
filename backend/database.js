@@ -1,65 +1,72 @@
 require('dotenv').config();
-const mysql = require('mysql2/promise');
+const sqlite3 = require('sqlite3').verbose();
 
-// MySQL database configuration
-const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'visit_user',
-    password: process.env.DB_PASSWORD || 'visit_password123',
-    database: process.env.DB_NAME || 'visit_sri_lanka',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-};
+// SQLite database file path
+const dbPath = process.env.DB_PATH || './visit-sri-lanka.db';
 
-// Create pool connection
-const pool = mysql.createPool(dbConfig);
-
-// Test connection
-async function testConnection() {
-    try {
-        const connection = await pool.getConnection();
-        console.log('Connected to MySQL database');
-        connection.release();
-        return true;
-    } catch (err) {
-        console.error('Error connecting to MySQL database:', err.message);
-        return false;
-    }
-}
-
-// Initialize database (create tables if they don't exist)
-async function initializeDatabase() {
-    try {
-        // Create feedback table if it doesn't exist
-        const createFeedbackTable = `
-            CREATE TABLE IF NOT EXISTS feedback (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                email VARCHAR(255) NOT NULL,
-                rating INT NOT NULL,
-                category VARCHAR(50),
-                subject VARCHAR(50),
-                message TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                INDEX idx_email (email),
-                INDEX idx_created_at (created_at)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-        `;
-        
-        await pool.query(createFeedbackTable);
-        console.log('Feedback table verified/created');
-        console.log('Database tables verified');
-    } catch (err) {
-        console.error('Error initializing database:', err.message);
-    }
-}
-
-// Test connection and initialize
-testConnection().then(success => {
-    if (success) {
-        initializeDatabase();
+// Create database connection
+const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        console.error('Error connecting to SQLite database:', err.message);
+    } else {
+        console.log('Connected to SQLite database');
     }
 });
 
-module.exports = pool;
+// Initialize database tables
+function initializeDatabase() {
+    // Create feedback table if it doesn't exist
+    db.run(`
+        CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            rating INTEGER NOT NULL,
+            category TEXT,
+            subject TEXT,
+            message TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `, (err) => {
+        if (err) {
+            console.error('Error creating feedback table:', err.message);
+        } else {
+            console.log('Feedback table verified/created');
+        }
+    });
+
+    console.log('Database tables verified');
+}
+
+// Initialize on load
+initializeDatabase();
+
+// Promisify db methods for async/await
+const dbPromise = {
+    run: (sql, params = []) => {
+        return new Promise((resolve, reject) => {
+            db.run(sql, params, function(err) {
+                if (err) reject(err);
+                else resolve({ lastID: this.lastID, changes: this.changes });
+            });
+        });
+    },
+    get: (sql, params = []) => {
+        return new Promise((resolve, reject) => {
+            db.get(sql, params, (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+    },
+    all: (sql, params = []) => {
+        return new Promise((resolve, reject) => {
+            db.all(sql, params, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+    }
+};
+
+module.exports = dbPromise;
