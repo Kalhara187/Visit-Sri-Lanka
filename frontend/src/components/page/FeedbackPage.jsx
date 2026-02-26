@@ -82,23 +82,52 @@ export default function FeedbackPage() {
     }
 
     setIsSubmitting(true);
+    setSubmitStatus(null);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('http://localhost:5000/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          rating: formData.rating,
+          category: formData.category,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
 
-    setIsSubmitting(false);
-    setSubmitStatus("success");
-    setFormData({
-      fullName: "",
-      email: "",
-      subject: "",
-      category: "",
-      rating: 0,
-      message: "",
-    });
+      const data = await response.json();
 
-    // Reset status after 5 seconds
-    setTimeout(() => setSubmitStatus(null), 5000);
+      setIsSubmitting(false);
+
+      if (data.success) {
+        setSubmitStatus("success");
+        setFormData({
+          fullName: "",
+          email: "",
+          subject: "",
+          category: "",
+          rating: 0,
+          message: "",
+        });
+        // Reset status after 5 seconds
+        setTimeout(() => setSubmitStatus(null), 5000);
+      } else {
+        setSubmitStatus("error");
+        // Reset error status after 5 seconds
+        setTimeout(() => setSubmitStatus(null), 5000);
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      setIsSubmitting(false);
+      setSubmitStatus("error");
+      // Reset error status after 5 seconds
+      setTimeout(() => setSubmitStatus(null), 5000);
+    }
   };
 
   return (
@@ -132,6 +161,15 @@ export default function FeedbackPage() {
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 Thank you! Your feedback has been submitted successfully. We appreciate your input!
+              </div>
+            )}
+
+            {submitStatus === "error" && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                Sorry! There was an error submitting your feedback. Please try again.
               </div>
             )}
 

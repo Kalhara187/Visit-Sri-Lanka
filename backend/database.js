@@ -28,9 +28,31 @@ async function testConnection() {
     }
 }
 
-// Initialize database (tables already created in MySQL)
-function initializeDatabase() {
-    console.log('Database tables verified');
+// Initialize database (create tables if they don't exist)
+async function initializeDatabase() {
+    try {
+        // Create feedback table if it doesn't exist
+        const createFeedbackTable = `
+            CREATE TABLE IF NOT EXISTS feedback (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                rating INT NOT NULL,
+                category VARCHAR(50),
+                subject VARCHAR(50),
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_email (email),
+                INDEX idx_created_at (created_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `;
+        
+        await pool.query(createFeedbackTable);
+        console.log('Feedback table verified/created');
+        console.log('Database tables verified');
+    } catch (err) {
+        console.error('Error initializing database:', err.message);
+    }
 }
 
 // Test connection and initialize
