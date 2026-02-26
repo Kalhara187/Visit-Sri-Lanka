@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 // Initialize express app
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -35,5 +37,9 @@ app.listen(PORT, () => {
     console.log(`API endpoints:`);
     console.log(`  POST /api/auth/register`);
     console.log(`  POST /api/auth/login`);
+    console.log(`  POST /api/feedback`);
+    console.log(`  GET  /api/feedback`);
+    console.log(`  GET  /api/feedback/stats`);
+    console.log(`  DELETE /api/feedback/:id`);
     console.log(`  GET  /api/health`);
 });
