@@ -35,6 +35,25 @@ function initializeDatabase() {
         }
     });
 
+    // Create contact_messages table if it doesn't exist
+    db.run(`
+        CREATE TABLE IF NOT EXISTS contact_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            message TEXT NOT NULL,
+            phone TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `, (err) => {
+        if (err) {
+            console.error('Error creating contact_messages table:', err.message);
+        } else {
+            console.log('Contact messages table verified/created');
+        }
+    });
+
     console.log('Database tables verified');
 }
 
