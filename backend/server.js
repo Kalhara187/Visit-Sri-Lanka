@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 // Initialize express app
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -41,5 +43,9 @@ app.listen(PORT, () => {
     console.log(`  GET  /api/feedback`);
     console.log(`  GET  /api/feedback/stats`);
     console.log(`  DELETE /api/feedback/:id`);
+    console.log(`  POST /api/contact`);
+    console.log(`  GET  /api/contact`);
+    console.log(`  GET  /api/contact/:id`);
+    console.log(`  DELETE /api/contact/:id`);
     console.log(`  GET  /api/health`);
 });
