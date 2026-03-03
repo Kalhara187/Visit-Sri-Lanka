@@ -39,13 +39,14 @@ async function testAPI() {
     await testEndpoint('Get Profile (protected)', 'GET', '/auth/me', null, token);
 
     // ---- Test Feedback: Submit ----
+    const ts = Date.now();
     await testEndpoint('Submit Feedback', 'POST', '/feedback', {
         fullName: 'Jane Doe',
-        email: 'jane@example.com',
+        email: `jane${ts}@example.com`,
         rating: 5,
         category: 'tour',
         subject: 'compliment',
-        message: 'Amazing experience visiting Sri Lanka!'
+        message: `Amazing experience visiting Sri Lanka! (run ${ts})`
     });
 
     // ---- Test Feedback: Get All ----

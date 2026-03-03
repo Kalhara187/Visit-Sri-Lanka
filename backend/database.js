@@ -77,8 +77,19 @@ function initializeDatabase() {
     console.log('Database tables verified');
 }
 
+// Run migrations to handle schema updates on existing databases
+function runMigrations() {
+    // Add created_at to users table if missing (handles old schemas)
+    db.run(`ALTER TABLE users ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP`, (err) => {
+        if (err && !err.message.includes('duplicate column')) {
+            // Column already exists or table doesn't exist yet - both OK
+        }
+    });
+}
+
 // Initialize on load
 initializeDatabase();
+runMigrations();
 
 // Promisify db methods for async/await
 const dbPromise = {
