@@ -1,6 +1,7 @@
 require('dotenv').config();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const db = require('../database');
 
 // JWT configuration from environment variables
 const JWT_SECRET = process.env.JWT_SECRET || 'visit-sri-lanka-secret-key-2024';
@@ -139,6 +140,36 @@ exports.login = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Server error during login'
+        });
+    }
+};
+
+// Get current logged-in user profile
+exports.getMe = async (req, res) => {
+    try {
+        // req.user is set by the protect middleware
+        const user = await db.get(
+            'SELECT id, fullName, email, phone, role, created_at FROM users WHERE id = ?',
+            [req.user.id]
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user: user
+        });
+
+    } catch (error) {
+        console.error('Get profile error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while fetching profile'
         });
     }
 };
