@@ -53,8 +53,8 @@ class User {
     static checkEmailExists(email) {
         return new Promise(async (resolve, reject) => {
             try {
-                const [rows] = await db.query('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
-                resolve(rows.length > 0);
+                const row = await db.get('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
+                resolve(!!row);
             } catch (err) {
                 reject(err);
             }
@@ -80,7 +80,7 @@ class User {
                     VALUES (?, ?, ?, ?, ?, ?)
                 `;
 
-                const [result] = await db.query(
+                const result = await db.run(
                     sql,
                     [
                         userData.fullName.trim(),
@@ -93,7 +93,7 @@ class User {
                 );
 
                 resolve({
-                    id: result.insertId,
+                    id: result.lastID,
                     fullName: userData.fullName.trim(),
                     email: normalizedEmail,
                     role: role
@@ -108,8 +108,8 @@ class User {
     static findByEmail(email) {
         return new Promise(async (resolve, reject) => {
             try {
-                const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
-                resolve(rows[0] || null);
+                const row = await db.get('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
+                resolve(row || null);
             } catch (err) {
                 reject(err);
             }
