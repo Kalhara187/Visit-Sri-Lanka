@@ -15,6 +15,26 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Initialize database tables
 function initializeDatabase() {
+    // Create users table if it doesn't exist
+    db.run(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fullName TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            phone TEXT,
+            role TEXT NOT NULL DEFAULT 'traveler',
+            acceptTerms INTEGER NOT NULL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `, (err) => {
+        if (err) {
+            console.error('Error creating users table:', err.message);
+        } else {
+            console.log('Users table verified/created');
+        }
+    });
+
     // Create feedback table if it doesn't exist
     db.run(`
         CREATE TABLE IF NOT EXISTS feedback (
