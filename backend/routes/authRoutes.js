@@ -18,4 +18,19 @@ router.post('/login', authController.login);
 // @access  Private (requires JWT token)
 router.get('/me', protect, authController.getMe);
 
+// @route   PUT /api/auth/profile
+// @desc    Update user profile
+// @access  Private
+router.put('/profile', protect, authController.updateProfile);
+
+// @route   POST /api/auth/forgot-password
+// @desc    Send password reset code
+// @access  Public
+router.post('/forgot-password', authController.forgotPassword);
+
+// @route   POST /api/auth/reset-password
+// @desc    Reset password with code
+// @access  Public
+router.post('/reset-password', authController.resetPassword);
+
 module.exports = router;

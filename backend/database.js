@@ -74,6 +74,50 @@ function initializeDatabase() {
         }
     });
 
+    // Create bookings table
+    db.run(`
+        CREATE TABLE IF NOT EXISTS bookings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            booking_type TEXT NOT NULL,
+            item_id INTEGER,
+            item_name TEXT NOT NULL,
+            guests INTEGER NOT NULL DEFAULT 1,
+            check_in TEXT NOT NULL,
+            check_out TEXT NOT NULL,
+            total_price REAL NOT NULL,
+            payment_method TEXT NOT NULL,
+            payment_status TEXT NOT NULL DEFAULT 'paid',
+            status TEXT NOT NULL DEFAULT 'confirmed',
+            special_requests TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    `, (err) => {
+        if (err) {
+            console.error('Error creating bookings table:', err.message);
+        } else {
+            console.log('Bookings table verified/created');
+        }
+    });
+
+    // Create password_reset_tokens table
+    db.run(`
+        CREATE TABLE IF NOT EXISTS password_reset_tokens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            token TEXT NOT NULL,
+            expires_at DATETIME NOT NULL,
+            used INTEGER NOT NULL DEFAULT 0
+        )
+    `, (err) => {
+        if (err) {
+            console.error('Error creating password_reset_tokens table:', err.message);
+        } else {
+            console.log('Password reset tokens table verified/created');
+        }
+    });
+
     console.log('Database tables verified');
 }
 

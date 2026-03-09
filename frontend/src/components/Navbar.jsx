@@ -19,6 +19,18 @@ export default function Navbar() {
   const location = useLocation();
   const { isDarkMode, toggleTheme } = useTheme();
 
+  const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+  const isLoggedIn = !!localStorage.getItem("token");
+  const isHotelOwner = storedUser?.role === "hotelOwner";
+  const dashboardPath = isHotelOwner ? "/hotel-dashboard" : "/dashboard";
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+    setIsMenuOpen(false);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -88,15 +100,31 @@ export default function Navbar() {
               )}
             </button>
 
-            <button onClick={() => navigate('/signin')} className={`relative px-6 py-2.5 font-semibold text-sm rounded-full overflow-hidden group transition-all duration-300 ${scrolled ? "border-2 border-ocean-600 dark:border-teal-400 text-ocean-700 dark:text-teal-400 hover:border-ocean-500 dark:hover:border-teal-300" : "border-2 border-white/40 text-white hover:border-white/80"}`}>
-              <span className="relative z-10 transition-colors duration-300 group-hover:text-white dark:group-hover:text-gray-900">
-                Sign In
-              </span>
-              <div className={`absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left ${scrolled ? "bg-gradient-to-r from-ocean-500 to-teal-500" : "bg-gradient-to-r from-saffron-500 to-orange-500"}`} />
-            </button>
-            <button onClick={() => navigate('/register')} className={`relative px-6 py-2.5 font-semibold text-sm text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 ${scrolled ? "bg-gradient-to-r from-ocean-500 via-teal-500 to-saffron-500 shadow-ocean-500/30 hover:shadow-ocean-500/40" : "bg-gradient-to-r from-saffron-500 via-orange-500 to-red-500 shadow-saffron-500/30 hover:shadow-saffron-500/50"}`}>
-              Register
-            </button>
+            {isLoggedIn ? (
+              <>
+                <button onClick={() => navigate(dashboardPath)} className={`relative px-5 py-2.5 font-semibold text-sm rounded-full overflow-hidden group transition-all duration-300 ${scrolled ? "border-2 border-ocean-600 dark:border-teal-400 text-ocean-700 dark:text-teal-400 hover:border-ocean-500" : "border-2 border-white/40 text-white hover:border-white/80"}`}>
+                  <span className="relative z-10 transition-colors duration-300 group-hover:text-white dark:group-hover:text-gray-900">
+                    Dashboard
+                  </span>
+                  <div className={`absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left ${scrolled ? "bg-gradient-to-r from-ocean-500 to-teal-500" : "bg-gradient-to-r from-saffron-500 to-orange-500"}`} />
+                </button>
+                <button onClick={handleSignOut} className={`relative px-6 py-2.5 font-semibold text-sm text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 ${scrolled ? "bg-gradient-to-r from-red-500 to-red-600" : "bg-gradient-to-r from-red-500 to-rose-500"}`}>
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => navigate('/signin')} className={`relative px-6 py-2.5 font-semibold text-sm rounded-full overflow-hidden group transition-all duration-300 ${scrolled ? "border-2 border-ocean-600 dark:border-teal-400 text-ocean-700 dark:text-teal-400 hover:border-ocean-500 dark:hover:border-teal-300" : "border-2 border-white/40 text-white hover:border-white/80"}`}>
+                  <span className="relative z-10 transition-colors duration-300 group-hover:text-white dark:group-hover:text-gray-900">
+                    Sign In
+                  </span>
+                  <div className={`absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left ${scrolled ? "bg-gradient-to-r from-ocean-500 to-teal-500" : "bg-gradient-to-r from-saffron-500 to-orange-500"}`} />
+                </button>
+                <button onClick={() => navigate('/register')} className={`relative px-6 py-2.5 font-semibold text-sm text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 ${scrolled ? "bg-gradient-to-r from-ocean-500 via-teal-500 to-saffron-500 shadow-ocean-500/30 hover:shadow-ocean-500/40" : "bg-gradient-to-r from-saffron-500 via-orange-500 to-red-500 shadow-saffron-500/30 hover:shadow-saffron-500/50"}`}>
+                  Register
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Toggle */}
@@ -136,12 +164,25 @@ export default function Navbar() {
               </a>
             ))}
             <div className="flex gap-3 pt-4 border-t border-gray-100/50 dark:border-gray-700/50">
-              <button onClick={() => { navigate('/signin'); setIsMenuOpen(false); }} className={`flex-1 font-semibold py-3 rounded-xl transition-colors duration-200 ${scrolled ? "border-2 border-ocean-600 dark:border-teal-400 text-ocean-700 dark:text-teal-400 hover:bg-ocean-50 dark:hover:bg-gray-800" : "border-2 border-white/40 text-white hover:bg-white/10"}`}>
-                Sign In
-              </button>
-              <button onClick={() => { navigate('/register'); setIsMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-saffron-500 via-orange-500 to-red-500 text-white font-semibold py-3 rounded-xl shadow-lg shadow-saffron-500/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-200">
-                Register
-              </button>
+              {isLoggedIn ? (
+                <>
+                  <button onClick={() => { navigate(dashboardPath); setIsMenuOpen(false); }} className={`flex-1 font-semibold py-3 rounded-xl transition-colors duration-200 ${scrolled ? "border-2 border-ocean-600 dark:border-teal-400 text-ocean-700 dark:text-teal-400 hover:bg-ocean-50 dark:hover:bg-gray-800" : "border-2 border-white/40 text-white hover:bg-white/10"}`}>
+                    Dashboard
+                  </button>
+                  <button onClick={handleSignOut} className="flex-1 bg-gradient-to-r from-red-500 to-rose-500 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => { navigate('/signin'); setIsMenuOpen(false); }} className={`flex-1 font-semibold py-3 rounded-xl transition-colors duration-200 ${scrolled ? "border-2 border-ocean-600 dark:border-teal-400 text-ocean-700 dark:text-teal-400 hover:bg-ocean-50 dark:hover:bg-gray-800" : "border-2 border-white/40 text-white hover:bg-white/10"}`}>
+                    Sign In
+                  </button>
+                  <button onClick={() => { navigate('/register'); setIsMenuOpen(false); }} className="flex-1 bg-gradient-to-r from-saffron-500 via-orange-500 to-red-500 text-white font-semibold py-3 rounded-xl shadow-lg shadow-saffron-500/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-200">
+                    Register
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

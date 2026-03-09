@@ -5,6 +5,7 @@ const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 
 // Initialize express app
 const app = express();
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -59,4 +61,10 @@ app.listen(PORT, () => {
     console.log(`  GET  /api/contact/:id`);
     console.log(`  DELETE /api/contact/:id`);
     console.log(`  GET  /api/health`);
+    console.log(`  POST /api/bookings`);
+    console.log(`  GET  /api/bookings/my`);
+    console.log(`  DELETE /api/bookings/:id`);
+    console.log(`  PUT  /api/auth/profile`);
+    console.log(`  POST /api/auth/forgot-password`);
+    console.log(`  POST /api/auth/reset-password`);
 });

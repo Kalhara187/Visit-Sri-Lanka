@@ -208,6 +208,19 @@ export default function DestinationsPage() {
   const [selectedDestination, setSelectedDestination] = useState(destinations[0]);
   const [activeTab, setActiveTab] = useState("about");
   const [showDestinationList, setShowDestinationList] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const categories = ["All", ...Array.from(new Set(destinations.map((d) => d.category)))];
+
+  const filteredDestinations = destinations.filter((d) => {
+    const matchesSearch =
+      d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.tagline.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "All" || d.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   const renderStars = (rating) => {
     return [...Array(5)].map((_, i) => (
@@ -237,11 +250,51 @@ export default function DestinationsPage() {
           </div>
         </section>
 
+        {/* Search & Filter Bar */}
+        <section className="py-8 px-4 bg-white shadow-sm">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Search */}
+              <div className="relative flex-1">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search destinations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                />
+              </div>
+              {/* Category Filter */}
+              <div className="flex gap-2 flex-wrap">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                      selectedCategory === cat
+                        ? "bg-teal-600 text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {filteredDestinations.length === 0 && (
+              <p className="text-center text-gray-500 mt-6">No destinations match your search.</p>
+            )}
+          </div>
+        </section>
+
         {/* Destination Grid */}
         <section className="py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {destinations.map((destination) => (
+              {filteredDestinations.map((destination) => (
                 <div
                   key={destination.id}
                   onClick={() => {

@@ -95,10 +95,10 @@ export default function SignIn() {
         // Role-based redirection
         if (data.user.role === 'hotelOwner') {
           // Redirect to Hotel Owner Dashboard
-          window.location.href = '/hotels';
+          window.location.href = '/hotel-dashboard';
         } else {
           // Redirect to User Dashboard (Traveler)
-          window.location.href = '/destinations';
+          window.location.href = '/dashboard';
         }
       } else {
         setErrors({
@@ -203,7 +203,7 @@ export default function SignIn() {
 
             {/* Forgot Password */}
             <div className="text-right mb-6">
-              <a href="#" className="text-sm text-teal-600 hover:text-teal-700 font-medium transition">
+              <a href="/forgot-password" className="text-sm text-teal-600 hover:text-teal-700 font-medium transition">
                 Forgot Password?
               </a>
             </div>

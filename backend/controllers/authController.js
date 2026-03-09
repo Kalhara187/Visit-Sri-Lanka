@@ -144,6 +144,95 @@ exports.login = async (req, res) => {
     }
 };
 
+// Update logged-in user profile
+exports.updateProfile = async (req, res) => {
+    try {
+        const { fullName, phone } = req.body;
+        if (!fullName || !fullName.trim()) {
+            return res.status(400).json({ success: false, message: 'Full name is required' });
+        }
+        await db.run(
+            'UPDATE users SET fullName = ?, phone = ? WHERE id = ?',
+            [fullName.trim(), phone || '', req.user.id]
+        );
+        const updated = await db.get(
+            'SELECT id, fullName, email, phone, role, created_at FROM users WHERE id = ?',
+            [req.user.id]
+        );
+        return res.json({ success: true, message: 'Profile updated', user: updated });
+    } catch (error) {
+        console.error('Update profile error:', error);
+        return res.status(500).json({ success: false, message: 'Server error updating profile' });
+    }
+};
+
+// Forgot Password - generate a reset code
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
+
+        const user = await db.get('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
+        // Always return success to avoid email enumeration
+        if (!user) {
+            return res.json({ success: true, message: 'If that email exists, a reset code has been sent.' });
+        }
+
+        // Generate 6-digit code
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 min
+
+        // Invalidate old tokens for this email
+        await db.run('DELETE FROM password_reset_tokens WHERE email = ?', [email.toLowerCase()]);
+        await db.run(
+            'INSERT INTO password_reset_tokens (email, token, expires_at) VALUES (?, ?, ?)',
+            [email.toLowerCase(), code, expiresAt]
+        );
+
+        // In production this would send an email; for dev we return the code directly
+        return res.json({ success: true, message: 'Reset code generated.', resetCode: code });
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+// Reset Password - verify code and set new password
+exports.resetPassword = async (req, res) => {
+    try {
+        const { email, code, newPassword } = req.body;
+        if (!email || !code || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Email, code, and new password are required' });
+        }
+        if (newPassword.length < 6) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+        }
+
+        const record = await db.get(
+            'SELECT * FROM password_reset_tokens WHERE email = ? AND token = ? AND used = 0',
+            [email.toLowerCase(), code]
+        );
+
+        if (!record) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired reset code' });
+        }
+
+        if (new Date(record.expires_at) < new Date()) {
+            return res.status(400).json({ success: false, message: 'Reset code has expired. Please request a new one.' });
+        }
+
+        const bcrypt = require('bcryptjs');
+        const hashed = await bcrypt.hash(newPassword, 10);
+        await db.run('UPDATE users SET password = ? WHERE email = ?', [hashed, email.toLowerCase()]);
+        await db.run('UPDATE password_reset_tokens SET used = 1 WHERE id = ?', [record.id]);
+
+        return res.json({ success: true, message: 'Password reset successfully. You can now sign in.' });
+    } catch (error) {
+        console.error('Reset password error:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
 // Get current logged-in user profile
 exports.getMe = async (req, res) => {
     try {

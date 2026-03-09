@@ -305,7 +305,7 @@ export default function TourPackagesPage() {
                         Details
                       </button>
                       <button
-                        onClick={() => navigate('/contact')}
+                        onClick={() => navigate('/booking', { state: { type: 'tour', item: pkg } })}
                         className="bg-sri-lanka-teal text-white px-4 py-2 rounded-lg hover:bg-sri-lanka-teal-dark transition-colors text-sm"
                       >
                         Book Now

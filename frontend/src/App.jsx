@@ -12,6 +12,10 @@ import HotelsPage from "./components/page/HotelsPage";
 import DestinationsPage from "./components/page/DestinationsPage";
 import TermsAndConditionsPage from "./components/page/TermsAndConditionsPage";
 import FeedbackPage from "./components/page/FeedbackPage";
+import BookingPage from "./components/page/BookingPage";
+import DashboardPage from "./components/page/DashboardPage";
+import HotelOwnerDashboard from "./components/page/HotelOwnerDashboard";
+import ForgotPasswordPage from "./components/page/ForgotPasswordPage";
 
 export default function App() {
   return (
@@ -31,6 +35,10 @@ export default function App() {
               <Route path="/destinations" element={<DestinationsPage />} />
               <Route path="/terms" element={<TermsAndConditionsPage />} />
               <Route path="/feedback" element={<FeedbackPage />} />
+              <Route path="/booking" element={<BookingPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/hotel-dashboard" element={<HotelOwnerDashboard />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             </Routes>
           </main>
           <Footer />
