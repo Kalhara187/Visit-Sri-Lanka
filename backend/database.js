@@ -1,5 +1,6 @@
 require('dotenv').config();
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
 
 // SQLite database file path
 const dbPath = process.env.DB_PATH || './visit-sri-lanka.db';
@@ -118,7 +119,55 @@ function initializeDatabase() {
         }
     });
 
+    // Create hotels table
+    db.run(`
+        CREATE TABLE IF NOT EXISTS hotels (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            owner_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            location TEXT NOT NULL,
+            facilities TEXT,
+            contact_details TEXT,
+            price_per_night REAL NOT NULL DEFAULT 0,
+            total_rooms INTEGER NOT NULL DEFAULT 0,
+            room_types TEXT,
+            status TEXT NOT NULL DEFAULT 'pending',
+            image_url TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (owner_id) REFERENCES users(id)
+        )
+    `, (err) => {
+        if (err) {
+            console.error('Error creating hotels table:', err.message);
+        } else {
+            console.log('Hotels table verified/created');
+            seedAdminUser();
+        }
+    });
+
     console.log('Database tables verified');
+}
+
+// Seed default admin user if none exists
+function seedAdminUser() {
+    db.get('SELECT id FROM users WHERE role = ?', ['admin'], async (err, row) => {
+        if (err || row) return; // error or admin already exists
+        try {
+            const hashed = await bcrypt.hash('Admin@123', 10);
+            db.run(
+                `INSERT INTO users (fullName, email, password, role, acceptTerms) VALUES (?, ?, ?, ?, ?)`,
+                ['System Administrator', 'admin@visitsrilanka.lk', hashed, 'admin', 1],
+                function (err2) {
+                    if (!err2 && this.changes > 0) {
+                        console.log('Default admin created  →  admin@visitsrilanka.lk / Admin@123');
+                    }
+                }
+            );
+        } catch (e) {
+            console.error('Admin seed error:', e.message);
+        }
+    });
 }
 
 // Run migrations to handle schema updates on existing databases
@@ -127,6 +176,12 @@ function runMigrations() {
     db.run(`ALTER TABLE users ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP`, (err) => {
         if (err && !err.message.includes('duplicate column')) {
             // Column already exists or table doesn't exist yet - both OK
+        }
+    });
+    // Add hotel_id to bookings if missing
+    db.run(`ALTER TABLE bookings ADD COLUMN hotel_id INTEGER`, (err) => {
+        if (err && !err.message.includes('duplicate column')) {
+            // OK
         }
     });
 }
