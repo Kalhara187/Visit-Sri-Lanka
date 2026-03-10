@@ -15,6 +15,7 @@ import FeedbackPage from "./components/page/FeedbackPage";
 import BookingPage from "./components/page/BookingPage";
 import DashboardPage from "./components/page/DashboardPage";
 import HotelOwnerDashboard from "./components/page/HotelOwnerDashboard";
+import AdminDashboard from "./components/page/AdminDashboard";
 import ForgotPasswordPage from "./components/page/ForgotPasswordPage";
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/booking" element={<BookingPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/hotel-dashboard" element={<HotelOwnerDashboard />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             </Routes>
           </main>

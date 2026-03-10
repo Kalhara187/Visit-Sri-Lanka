@@ -21,8 +21,9 @@ export default function Navbar() {
 
   const storedUser = JSON.parse(localStorage.getItem("user") || "null");
   const isLoggedIn = !!localStorage.getItem("token");
+  const isAdmin = storedUser?.role === "admin";
   const isHotelOwner = storedUser?.role === "hotelOwner";
-  const dashboardPath = isHotelOwner ? "/hotel-dashboard" : "/dashboard";
+  const dashboardPath = isAdmin ? "/admin-dashboard" : (isHotelOwner ? "/hotel-dashboard" : "/dashboard");
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
