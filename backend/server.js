@@ -6,6 +6,8 @@ const authRoutes = require('./routes/authRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+const hotelRoutes = require('./routes/hotelRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Initialize express app
 const app = express();
@@ -31,6 +33,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/hotels', hotelRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -67,4 +71,13 @@ app.listen(PORT, () => {
     console.log(`  PUT  /api/auth/profile`);
     console.log(`  POST /api/auth/forgot-password`);
     console.log(`  POST /api/auth/reset-password`);
+    console.log(`  GET  /api/hotels/approved`);
+    console.log(`  POST /api/hotels (hotel owner)`);
+    console.log(`  GET  /api/hotels/my (hotel owner)`);
+    console.log(`  GET  /api/hotels/my-bookings (hotel owner)`);
+    console.log(`  GET  /api/admin/stats (admin)`);
+    console.log(`  GET  /api/admin/users (admin)`);
+    console.log(`  GET  /api/admin/hotels (admin)`);
+    console.log(`  GET  /api/admin/bookings (admin)`);
+    console.log(`  Default admin: admin@visitsrilanka.lk / Admin@123`);
 });

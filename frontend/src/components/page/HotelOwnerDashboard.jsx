@@ -1,53 +1,66 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const MOCK_HOTEL = {
-  name: "My Hotel Property",
-  location: "Colombo",
-  rating: 4.5,
-  totalRooms: 24,
-  pricePerNight: 120,
-  amenities: ["Free WiFi", "Swimming Pool", "Restaurant", "Parking"],
-  image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+const API = "http://localhost:5000/api";
+
+const EMPTY_HOTEL_FORM = {
+  name: "",
+  description: "",
+  location: "",
+  facilities: "",
+  contactDetails: "",
+  pricePerNight: "",
+  totalRooms: "",
+  roomTypes: "",
+  imageUrl: "",
 };
+
+
 
 export default function HotelOwnerDashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [hotels, setHotels] = useState([]);
   const [bookings, setBookings] = useState([]);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("hotels");
   const [isLoading, setIsLoading] = useState(true);
   const [profileMsg, setProfileMsg] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({ fullName: "", phone: "" });
+  const [hotelForm, setHotelForm] = useState(EMPTY_HOTEL_FORM);
+  const [editingHotelId, setEditingHotelId] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [hotelMsg, setHotelMsg] = useState("");
+  const [hotelErrors, setHotelErrors] = useState({});
+  const [savingHotel, setSavingHotel] = useState(false);
 
   const token = localStorage.getItem("token");
+  const authHeaders = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
   useEffect(() => {
     if (!token) { navigate("/signin"); return; }
-
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-    if (storedUser.role !== "hotelOwner") {
-      navigate("/dashboard");
-      return;
-    }
-
-    fetchProfile();
-    fetchBookings();
+    if (storedUser.role !== "hotelOwner") { navigate("/dashboard"); return; }
+    fetchAll();
   }, []);
 
-  const fetchProfile = async () => {
+  const fetchAll = async () => {
+    setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.success) {
-        setUser(data.user);
-        setProfileForm({ fullName: data.user.fullName, phone: data.user.phone || "" });
+      const [pRes, hRes, bRes] = await Promise.all([
+        fetch(`${API}/auth/me`, { headers: authHeaders }),
+        fetch(`${API}/hotels/my`, { headers: authHeaders }),
+        fetch(`${API}/hotels/my-bookings`, { headers: authHeaders }),
+      ]);
+      const [pData, hData, bData] = await Promise.all([pRes.json(), hRes.json(), bRes.json()]);
+      if (pData.success) {
+        setUser(pData.user);
+        setProfileForm({ fullName: pData.user.fullName, phone: pData.user.phone || "" });
       } else {
-        navigate("/signin");
+        navigate("/signin"); return;
       }
+      if (hData.success) setHotels(hData.hotels);
+      if (bData.success) setBookings(bData.bookings);
     } catch {
       navigate("/signin");
     } finally {
@@ -55,28 +68,18 @@ export default function HotelOwnerDashboard() {
     }
   };
 
-  const fetchBookings = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/bookings/my", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.success) setBookings(data.bookings.filter((b) => b.booking_type === "hotel"));
-    } catch {
-      // pass
-    }
+  const flash = (setter, msg, delay = 4000) => {
+    setter(msg);
+    setTimeout(() => setter(""), delay);
   };
 
+  // â”€â”€ Profile update â”€â”€
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
-    setProfileMsg("");
     try {
-      const res = await fetch("http://localhost:5000/api/auth/profile", {
+      const res = await fetch(`${API}/auth/profile`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: authHeaders,
         body: JSON.stringify(profileForm),
       });
       const data = await res.json();
@@ -84,13 +87,109 @@ export default function HotelOwnerDashboard() {
         setUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));
         setEditMode(false);
-        setProfileMsg("Profile updated!");
-        setTimeout(() => setProfileMsg(""), 3000);
+        flash(setProfileMsg, "Profile updated!");
       } else {
-        setProfileMsg(data.message || "Update failed.");
+        flash(setProfileMsg, data.message || "Update failed.");
       }
     } catch {
-      setProfileMsg("Connection error.");
+      flash(setProfileMsg, "Connection error.");
+    }
+  };
+
+  // â”€â”€ Hotel form helpers â”€â”€
+  const startAddHotel = () => {
+    setEditingHotelId(null);
+    setHotelForm(EMPTY_HOTEL_FORM);
+    setHotelErrors({});
+    setShowAddForm(true);
+  };
+
+  const startEditHotel = (hotel) => {
+    setEditingHotelId(hotel.id);
+    setHotelForm({
+      name: hotel.name || "",
+      description: hotel.description || "",
+      location: hotel.location || "",
+      facilities: hotel.facilities || "",
+      contactDetails: hotel.contact_details || "",
+      pricePerNight: hotel.price_per_night ?? "",
+      totalRooms: hotel.total_rooms ?? "",
+      roomTypes: hotel.room_types || "",
+      imageUrl: hotel.image_url || "",
+    });
+    setHotelErrors({});
+    setShowAddForm(true);
+  };
+
+  const validateHotelForm = () => {
+    const e = {};
+    if (!hotelForm.name.trim()) e.name = "Hotel name is required";
+    if (!hotelForm.location.trim()) e.location = "Location is required";
+    if (hotelForm.pricePerNight !== "" && isNaN(Number(hotelForm.pricePerNight)))
+      e.pricePerNight = "Price must be a number";
+    if (hotelForm.totalRooms !== "" && isNaN(Number(hotelForm.totalRooms)))
+      e.totalRooms = "Rooms must be a number";
+    return e;
+  };
+
+  const handleSaveHotel = async (e) => {
+    e.preventDefault();
+    const errs = validateHotelForm();
+    if (Object.keys(errs).length > 0) { setHotelErrors(errs); return; }
+    setSavingHotel(true);
+    try {
+      const url = editingHotelId ? `${API}/hotels/${editingHotelId}` : `${API}/hotels`;
+      const method = editingHotelId ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: authHeaders,
+        body: JSON.stringify(hotelForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowAddForm(false);
+        flash(setHotelMsg, editingHotelId ? "Hotel updated!" : "Hotel submitted for review.");
+        const hRes = await fetch(`${API}/hotels/my`, { headers: authHeaders });
+        const hData = await hRes.json();
+        if (hData.success) setHotels(hData.hotels);
+      } else {
+        flash(setHotelMsg, data.message || "Failed to save hotel.");
+      }
+    } catch {
+      flash(setHotelMsg, "Connection error.");
+    } finally {
+      setSavingHotel(false);
+    }
+  };
+
+  const handleDeleteHotel = async (id) => {
+    if (!window.confirm("Delete this hotel listing?")) return;
+    try {
+      const res = await fetch(`${API}/hotels/${id}`, { method: "DELETE", headers: authHeaders });
+      const data = await res.json();
+      if (data.success) {
+        setHotels((p) => p.filter((h) => h.id !== id));
+        flash(setHotelMsg, "Hotel deleted.");
+      }
+    } catch {
+      flash(setHotelMsg, "Connection error.");
+    }
+  };
+
+  // â”€â”€ Booking status management â”€â”€
+  const handleBookingStatus = async (bookingId, status) => {
+    try {
+      const res = await fetch(`${API}/hotels/${bookingId}/booking-status`, {
+        method: "PUT",
+        headers: authHeaders,
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setBookings((p) => p.map((b) => b.id === bookingId ? { ...b, status } : b));
+      }
+    } catch {
+      // pass
     }
   };
 
@@ -104,8 +203,14 @@ export default function HotelOwnerDashboard() {
     .filter((b) => b.status === "confirmed")
     .reduce((s, b) => s + b.total_price, 0);
 
-  const statusBadge = (status) => {
-    const map = { confirmed: "bg-green-100 text-green-700", cancelled: "bg-red-100 text-red-700" };
+  const statusPill = (status) => {
+    const map = {
+      confirmed: "bg-green-100 text-green-700",
+      cancelled: "bg-red-100 text-red-700",
+      rejected: "bg-red-100 text-red-700",
+      pending: "bg-yellow-100 text-yellow-700",
+      approved: "bg-green-100 text-green-700",
+    };
     return map[status] || "bg-gray-100 text-gray-600";
   };
 
@@ -120,15 +225,14 @@ export default function HotelOwnerDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 pb-12 px-4">
       <div className="max-w-5xl mx-auto">
+
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
             <span className="text-xs font-semibold bg-teal-100 text-teal-700 px-2 py-1 rounded-full uppercase tracking-wide">
               Hotel Owner
             </span>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white mt-2">
-              Property Dashboard
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white mt-2">Property Dashboard</h1>
             <p className="text-gray-500 dark:text-gray-400">Welcome, {user?.fullName}</p>
           </div>
           <button
@@ -136,7 +240,8 @@ export default function HotelOwnerDashboard() {
             className="self-start md:self-auto flex items-center gap-2 border border-red-300 text-red-500 px-4 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
             Sign Out
           </button>
@@ -145,10 +250,10 @@ export default function HotelOwnerDashboard() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total Bookings", value: bookings.length, icon: "📋" },
-            { label: "Confirmed", value: bookings.filter((b) => b.status === "confirmed").length, icon: "✅" },
-            { label: "Total Revenue", value: `$${revenue.toFixed(0)}`, icon: "💰" },
-            { label: "Total Rooms", value: MOCK_HOTEL.totalRooms, icon: "🏨" },
+            { label: "My Hotels", value: hotels.length, icon: "ðŸ¨" },
+            { label: "Total Bookings", value: bookings.length, icon: "ðŸ“‹" },
+            { label: "Confirmed", value: bookings.filter((b) => b.status === "confirmed").length, icon: "âœ…" },
+            { label: "Total Revenue", value: `$${revenue.toFixed(0)}`, icon: "ðŸ’°" },
           ].map((s) => (
             <div key={s.label} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
               <div className="text-2xl mb-1">{s.icon}</div>
@@ -160,7 +265,7 @@ export default function HotelOwnerDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-4 border-b border-gray-200 dark:border-gray-700 mb-6">
-          {["overview", "bookings", "profile"].map((tab) => (
+          {["hotels", "bookings", "profile"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -170,92 +275,154 @@ export default function HotelOwnerDashboard() {
                   : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
             >
-              {tab === "overview" ? "My Property" : tab === "bookings" ? "Bookings" : "Profile"}
+              {tab === "hotels" ? "My Hotels" : tab === "bookings" ? "Bookings" : "Profile"}
             </button>
           ))}
         </div>
 
-        {/* ── Overview Tab ── */}
-        {activeTab === "overview" && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-            <div className="relative h-48">
-              <img src={MOCK_HOTEL.image} alt="Hotel" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <h2 className="absolute bottom-4 left-6 text-white text-2xl font-bold">{MOCK_HOTEL.name}</h2>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500 mb-1">Location</p>
-                  <p className="font-medium text-gray-800 dark:text-white">{MOCK_HOTEL.location}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 mb-1">Rating</p>
-                  <p className="font-medium text-yellow-500">⭐ {MOCK_HOTEL.rating}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 mb-1">Price / Night</p>
-                  <p className="font-medium text-gray-800 dark:text-white">${MOCK_HOTEL.pricePerNight}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 mb-1">Rooms</p>
-                  <p className="font-medium text-gray-800 dark:text-white">{MOCK_HOTEL.totalRooms}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-gray-500 text-sm mb-2">Amenities</p>
-                <div className="flex flex-wrap gap-2">
-                  {MOCK_HOTEL.amenities.map((a) => (
-                    <span key={a} className="bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 text-xs px-2 py-1 rounded-full">
-                      {a}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  To update your property details, contact the Visit Sri Lanka admin team at{" "}
-                  <a href="mailto:admin@visitsrilanka.lk" className="text-teal-600 hover:underline">
-                    admin@visitsrilanka.lk
-                  </a>
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Bookings Tab ── */}
-        {activeTab === "bookings" && (
+        {/* â”€â”€ Hotels Tab â”€â”€ */}
+        {activeTab === "hotels" && (
           <div>
-            {bookings.length === 0 ? (
+            {hotelMsg && (
+              <div className={`mb-4 p-3 rounded-lg text-sm border ${hotelMsg.includes("error") || hotelMsg.includes("failed") || hotelMsg.includes("Failed")
+                  ? "bg-red-50 text-red-700 border-red-200"
+                  : "bg-teal-50 text-teal-700 border-teal-200"
+                }`}>
+                {hotelMsg}
+              </div>
+            )}
+
+            {/* Add hotel button */}
+            {!showAddForm && (
+              <div className="mb-6">
+                <button
+                  onClick={startAddHotel}
+                  className="flex items-center gap-2 bg-teal-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-teal-700 transition"
+                >
+                  <span className="text-lg">+</span> Add New Hotel
+                </button>
+              </div>
+            )}
+
+            {/* Add / Edit form */}
+            {showAddForm && (
+              <div className="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-4">
+                  {editingHotelId ? "Edit Hotel" : "Add New Hotel"}
+                </h2>
+                <form onSubmit={handleSaveHotel} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { key: "name", label: "Hotel Name *", type: "text" },
+                    { key: "location", label: "Location *", type: "text" },
+                    { key: "pricePerNight", label: "Price per Night ($)", type: "number" },
+                    { key: "totalRooms", label: "Total Rooms", type: "number" },
+                  ].map(({ key, label, type }) => (
+                    <div key={key}>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
+                      <input
+                        type={type}
+                        value={hotelForm[key]}
+                        onChange={(e) => { setHotelForm((p) => ({ ...p, [key]: e.target.value })); setHotelErrors((p) => ({ ...p, [key]: "" })); }}
+                        className={`w-full border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${hotelErrors[key] ? "border-red-400" : "border-gray-300 dark:border-gray-600"}`}
+                      />
+                      {hotelErrors[key] && <p className="text-xs text-red-500 mt-1">{hotelErrors[key]}</p>}
+                    </div>
+                  ))}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                    <textarea
+                      rows={3}
+                      value={hotelForm.description}
+                      onChange={(e) => setHotelForm((p) => ({ ...p, description: e.target.value }))}
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    />
+                  </div>
+                  {[
+                    { key: "roomTypes", label: "Room Types (e.g. Standard, Deluxe, Suite)" },
+                    { key: "facilities", label: "Facilities (comma-separated)" },
+                    { key: "contactDetails", label: "Contact Details" },
+                    { key: "imageUrl", label: "Hotel Image URL" },
+                  ].map(({ key, label }) => (
+                    <div key={key} className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
+                      <input
+                        type="text"
+                        value={hotelForm[key]}
+                        onChange={(e) => setHotelForm((p) => ({ ...p, [key]: e.target.value }))}
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      />
+                    </div>
+                  ))}
+                  <div className="md:col-span-2 flex gap-3 pt-2">
+                    <button
+                      type="submit"
+                      disabled={savingHotel}
+                      className="flex-1 bg-teal-600 text-white py-2.5 rounded-lg font-semibold hover:bg-teal-700 transition disabled:opacity-60"
+                    >
+                      {savingHotel ? "Savingâ€¦" : editingHotelId ? "Update Hotel" : "Submit Hotel"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddForm(false)}
+                      className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Hotel listings */}
+            {hotels.length === 0 ? (
               <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
-                <div className="text-5xl mb-4">📭</div>
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-white">
-                  No hotel bookings yet
-                </h3>
-                <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  Bookings made for your property will appear here.
-                </p>
+                <div className="text-5xl mb-4">ðŸ¨</div>
+                <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">No hotels listed yet</h3>
+                <p className="text-gray-500 dark:text-gray-400">Add your first hotel to start receiving bookings.</p>
               </div>
             ) : (
               <div className="space-y-4">
-                {bookings.map((b) => (
-                  <div
-                    key={b.id}
-                    className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                      <div>
-                        <h4 className="font-bold text-gray-800 dark:text-white">{b.item_name}</h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Ref #{b.id} &bull; {b.check_in} → {b.check_out} &bull; {b.guests} guest{b.guests > 1 ? "s" : ""}
-                        </p>
+                {hotels.map((h) => (
+                  <div key={h.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h4 className="font-bold text-gray-800 dark:text-white text-lg">{h.name}</h4>
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${statusPill(h.status)}`}>
+                            {h.status}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2">
+                          <span>ðŸ“ {h.location}</span>
+                          <span>ðŸ’µ ${Number(h.price_per_night).toFixed(0)}/night</span>
+                          <span>ðŸ› {h.total_rooms} rooms</span>
+                          {h.contact_details && <span>ðŸ“ž {h.contact_details}</span>}
+                        </div>
+                        {h.facilities && (
+                          <p className="text-xs text-gray-400 mt-1">Facilities: {h.facilities}</p>
+                        )}
+                        {h.room_types && (
+                          <p className="text-xs text-gray-400 mt-1">Rooms: {h.room_types}</p>
+                        )}
+                        {h.status === "pending" && (
+                          <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-2">
+                            â³ Under review by admin
+                          </p>
+                        )}
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`text-xs font-semibold px-2 py-1 rounded-full capitalize ${statusBadge(b.status)}`}>
-                          {b.status}
-                        </span>
-                        <span className="font-bold text-teal-600">${b.total_price.toFixed(2)}</span>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => startEditHotel(h)}
+                          className="text-sm border border-teal-300 text-teal-600 px-3 py-1.5 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteHotel(h.id)}
+                          className="text-sm border border-red-200 text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -265,12 +432,73 @@ export default function HotelOwnerDashboard() {
           </div>
         )}
 
-        {/* ── Profile Tab ── */}
+        {/* â”€â”€ Bookings Tab â”€â”€ */}
+        {activeTab === "bookings" && (
+          <div>
+            {bookings.length === 0 ? (
+              <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
+                <div className="text-5xl mb-4">ðŸ“­</div>
+                <h3 className="text-lg font-semibold text-gray-700 dark:text-white">No bookings yet</h3>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">
+                  Bookings for your hotels will appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {bookings.map((b) => (
+                  <div key={b.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                      <div>
+                        <h4 className="font-bold text-gray-800 dark:text-white">{b.item_name}</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Guest: {b.guestName || "N/A"} ({b.guestEmail})
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Ref #{b.id} &bull; {b.check_in} â†’ {b.check_out} &bull; {b.guests} guest{b.guests > 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full capitalize ${statusPill(b.status)}`}>
+                          {b.status}
+                        </span>
+                        <span className="font-bold text-teal-600">${Number(b.total_price).toFixed(2)}</span>
+                        {b.status === "confirmed" && (
+                          <button
+                            onClick={() => handleBookingStatus(b.id, "rejected")}
+                            className="text-xs border border-orange-300 text-orange-500 px-2 py-1 rounded hover:bg-orange-50 transition"
+                          >
+                            Reject
+                          </button>
+                        )}
+                        {(b.status === "pending" || b.status === "rejected") && (
+                          <button
+                            onClick={() => handleBookingStatus(b.id, "confirmed")}
+                            className="text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition"
+                          >
+                            Accept
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {b.special_requests && (
+                      <p className="text-xs text-gray-400 mt-2">Note: {b.special_requests}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* â”€â”€ Profile Tab â”€â”€ */}
         {activeTab === "profile" && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 max-w-xl">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Profile Settings</h2>
             {profileMsg && (
-              <div className={`mb-4 p-3 rounded-lg text-sm ${profileMsg.includes("updated") ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-600 border border-red-200"}`}>
+              <div className={`mb-4 p-3 rounded-lg text-sm border ${profileMsg.includes("updated") || profileMsg === "Profile updated!"
+                  ? "bg-green-50 text-green-700 border-green-200"
+                  : "bg-red-50 text-red-600 border-red-200"
+                }`}>
                 {profileMsg}
               </div>
             )}
@@ -295,12 +523,8 @@ export default function HotelOwnerDashboard() {
                   />
                 </div>
                 <div className="flex gap-3">
-                  <button type="submit" className="flex-1 bg-teal-600 text-white py-2 rounded-lg font-semibold hover:bg-teal-700 transition">
-                    Save
-                  </button>
-                  <button type="button" onClick={() => setEditMode(false)} className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                    Cancel
-                  </button>
+                  <button type="submit" className="flex-1 bg-teal-600 text-white py-2 rounded-lg font-semibold hover:bg-teal-700 transition">Save</button>
+                  <button type="button" onClick={() => setEditMode(false)} className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</button>
                 </div>
               </form>
             ) : (
@@ -311,10 +535,11 @@ export default function HotelOwnerDashboard() {
                     ["Full Name", user?.fullName],
                     ["Phone", user?.phone || "Not set"],
                     ["Role", "Hotel Owner"],
+                    ["Member Since", user?.created_at ? new Date(user.created_at).toLocaleDateString() : "â€”"],
                   ].map(([label, val]) => (
                     <div key={label} className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                       <span className="text-gray-500">{label}</span>
-                      <span className="font-medium text-gray-800 dark:text-white capitalize">{val}</span>
+                      <span className="font-medium text-gray-800 dark:text-white">{val}</span>
                     </div>
                   ))}
                 </div>
@@ -328,6 +553,7 @@ export default function HotelOwnerDashboard() {
             )}
           </div>
         )}
+
       </div>
     </div>
   );

@@ -93,7 +93,9 @@ export default function SignIn() {
         localStorage.setItem('user', JSON.stringify(data.user));
         
         // Role-based redirection
-        if (data.user.role === 'hotelOwner') {
+        if (data.user.role === 'admin') {
+          window.location.href = '/admin-dashboard';
+        } else if (data.user.role === 'hotelOwner') {
           // Redirect to Hotel Owner Dashboard
           window.location.href = '/hotel-dashboard';
         } else {
