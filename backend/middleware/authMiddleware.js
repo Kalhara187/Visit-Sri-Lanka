@@ -53,4 +53,26 @@ const optionalAuth = (req, res, next) => {
     next();
 };
 
-module.exports = { protect, optionalAuth };
+// Admin-only middleware (must be used after protect)
+const isAdmin = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ success: false, message: 'Not authorized' });
+    }
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Admin access required' });
+    }
+    next();
+};
+
+// Hotel owner middleware – admin can also access (must be used after protect)
+const isHotelOwner = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ success: false, message: 'Not authorized' });
+    }
+    if (req.user.role !== 'hotelOwner' && req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Hotel owner access required' });
+    }
+    next();
+};
+
+module.exports = { protect, optionalAuth, isAdmin, isHotelOwner };
